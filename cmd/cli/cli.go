@@ -26,6 +26,8 @@ func main() {
 	url := flag.String("url", "http://google.com", "URL to test")
 	virtualUsers := flag.Int("virtualUsers", 10, "Number of virtual users. Under 100 QPS, 1 virtual user = 1 query per second. Above 100 QPS, the queries will be distributed evenly across the virtual users. Note that the actual QPS might be slightly under what is specified in -qps due to rounding down.")
 	spawnEvenly := flag.Bool("spawnEvenly", false, "If true, the test runner will spawn the virtual users evenly across each second duration of the test phase")
+	// TODO: add flag for HTTP timeout
+	// TODO: add ability to specify multiple phases through CLI
 	flag.Parse()
 
 	var numIterations int

@@ -172,6 +172,9 @@ func calculatePhaseMetrics(virtualUsers []*VirtualUser) models.VirtualUserAggreg
 			failedVUs++
 		}
 	}
+	if len(executionDurations) == 0 {
+		return models.VirtualUserAggregatedMetrics{}
+	}
 	// Sort the durations slice
 	sort.Slice(executionDurations, func(i, j int) bool {
 		return executionDurations[i] < executionDurations[j]

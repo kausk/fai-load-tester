@@ -2,7 +2,7 @@
 
 **Overview**
 
-This loadtester generates load by spawning a specified number of Virtual Users (VUs) each second, which each make a specified number of HTTP requests. A desired QPS is achieved by dividing the QPS into VUs and iterations per VU.
+This loadtester generates load by spawning a specified number of Virtual Users (VUs) each second over a given duration, which each make a specified number of HTTP requests. A desired QPS is achieved by dividing the QPS into VUs and iterations per VU.
 
 The load test is specified using `models.TestPlan`, and this is passed into `service.TestRunner` which executes the test.
 
