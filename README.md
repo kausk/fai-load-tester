@@ -35,7 +35,7 @@ docker run --network host --rm loadtester -url http://host.docker.internal:8081 
 docker run --network host --rm loadtester -url http://yahoo.com -qps 50 ## accessing external URL
 ```
 
-# API Documentation available in examples/examples.go
+# API usage example available in examples/examples.go
 
 
 # Running Unit Tests
