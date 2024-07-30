@@ -36,3 +36,9 @@ docker run --network host --rm loadtester -url http://yahoo.com -qps 50 ## acces
 ```
 
 **API Documentation available in examples/examples.go**
+
+
+***Running Unit Tests***
+```
+~/d/loadtester (main) [1]> go test ./...
+```
