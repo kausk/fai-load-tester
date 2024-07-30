@@ -6,8 +6,6 @@ package main
 
 import (
 	"fmt"
-	"time"
-
 	"loadtester/pkg/models"
 	"loadtester/pkg/service"
 )
@@ -17,6 +15,7 @@ func main() {
 }
 
 func loadTestQPS() {
+	// Create a test plan with phases and a test case
 	tcOneIteration := models.TestCaseGetRequest{
 		URL:           "http://google.com",
 		NumIterations: 1,
@@ -42,9 +41,12 @@ func loadTestQPS() {
 			},
 		},
 	}
+	// Create a test runner and start the test
 	tr := service.NewTestRunner(tp)
 	tr.Start()
-	time.Sleep(10 * time.Second)
+	<-tr.Done
+	// Print the overall results
+	// Per-phase results also available in tr.ResultsByPhase()
 	fmt.Println(tr.OverallResults().String())
 }
 

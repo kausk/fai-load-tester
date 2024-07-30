@@ -31,12 +31,12 @@ func main() {
 	var numIterations int
 	var numVirtualUsers int
 	if *qps < 100 {
-		fmt.Println("Ignoring virtualUsers flag since QPS is less than 100")
+		fmt.Println("Ignoring virtualUsers flag since QPS is less than 20")
 		numIterations = 1
 		numVirtualUsers = *qps
 	} else {
 		numVirtualUsers = *virtualUsers
-		numIterations = *qps / numVirtualUsers
+		numIterations = *qps / numVirtualUsers // TODO: this will round down the QPS to the nearest //10, fix this by adding the remaining QPS to the last virtual user
 	}
 	fmt.Printf("Executing load test with %d QPS over %d seconds duration: %d virtual users (VUs) spawned per second, %d requests per VU\n", *qps, *duration, numVirtualUsers, numIterations)
 	tc := models.TestCaseGetRequest{

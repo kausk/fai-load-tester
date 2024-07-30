@@ -1,1 +1,29 @@
 # fai-load-tester
+
+**Usage Instructions**
+
+**CLI Documentation**
+```
+docker run --network host --rm loadtester --help
+Usage of ./cli:
+  -duration int
+    	Duration of the test in seconds (default 10)
+  -qps int
+    	Queries per second (default 10)
+  -spawnEvenly
+    	If true, the test runner will spawn the virtual users evenly across each second duration of the test phase
+  -url string
+    	URL to test (default "http://google.com")
+  -virtualUsers int
+    	Number of virtual users. Under 100 QPS, 1 virtual user = 1 query per second. Above 100 QPS, the queries will be distributed evenly across the virtual users. (default 10)
+
+```
+
+**Docker CLI Instructions**
+```=
+docker build -t loadtester .
+docker run --network host --rm loadtester -url http://host.docker.internal:8081 -qps 300 ## accessing localhost URL
+docker run --network host --rm loadtester -url http://yahoo.com -qps 50 ## accessing external URL
+```
+
+**API Documentation available in examples/examples.go**
