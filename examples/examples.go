@@ -6,9 +6,10 @@ package main
 
 import (
 	"fmt"
+	"time"
+
 	"loadtester/pkg/models"
 	"loadtester/pkg/service"
-	"time"
 )
 
 func main() {
