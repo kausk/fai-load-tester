@@ -10,9 +10,9 @@ Metrics are collected and stored in `service.TestRunner.MetricsByPhase` and `ser
 
 
 
-# Usage Instructions**
+# Usage Instructions
 
-## CLI Documentation**
+## CLI Documentation
 ```
 ksk@Kaushiks-MacBook-Pro-2 ~/d/loadtester (main)> docker run --network host --rm loadtester --help
 Usage of ./cli:
@@ -28,14 +28,14 @@ Usage of ./cli:
     	Number of virtual users. Under 100 QPS, 1 virtual user = 1 query per second. Above 100 QPS, the queries will be distributed evenly across the virtual users. Note that the actual QPS might be slightly under what is specified in -qps due to rounding down. (default 10)
 ```
 
-## Docker CLI Instructions**
+## Docker CLI Instructions
 ```=
 docker build -t loadtester .
 docker run --network host --rm loadtester -url http://host.docker.internal:8081 -qps 300 ## accessing localhost URL
 docker run --network host --rm loadtester -url http://yahoo.com -qps 50 ## accessing external URL
 ```
 
-# API Documentation available in examples/examples.go**
+# API Documentation available in examples/examples.go
 
 
 # Running Unit Tests**
