@@ -37,7 +37,7 @@ func NewMockHTTPClient(mockHTTPServer *MockHTTPServer, clientLatencyMS int) *Moc
 	}
 }
 
-func (m MockHTTPClient) Get(_ string) (*http.Response, error) {
+func (m *MockHTTPClient) Get(_ string) (*http.Response, error) {
 	time.Sleep(time.Duration(m.clientLatencyMS) * time.Millisecond) // simulate latency
 	m.server.mu.Lock()
 	if m.server.returnTimeouts {

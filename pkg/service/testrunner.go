@@ -61,9 +61,15 @@ func (t *TestRunner) Status() models.Status {
 	return t.status
 }
 
-func (t TestRunner) Results() models.OverallMetrics {
+func (t *TestRunner) ResultsByPhase() []models.VirtualUserAggregatedMetrics {
+	return t.MetricsByPhase
+}
+
+func (t *TestRunner) OverallResults() models.OverallMetrics {
 	return t.OverallMetrics
 }
+
+// TODO: add support for cancelling TestRunner during execution using ctx.Cancel()
 
 func (t *TestRunner) executePhase(tp models.TestPhase) models.VirtualUserAggregatedMetrics {
 	var wg sync.WaitGroup
@@ -73,7 +79,8 @@ func (t *TestRunner) executePhase(tp models.TestPhase) models.VirtualUserAggrega
 	} else {
 		vus = t.spawnVUsAtStartOfSecond(tp, &wg)
 	}
-	wg.Wait() // wait for any remaining virtual users to finish
+	// TODO: remove requirement to wait for phases, and instead calculate metrics asynchronously using channels
+	wg.Wait()
 	metrics := calculatePhaseMetrics(vus)
 	printPhaseMetrics(tp.Name, metrics)
 	return metrics

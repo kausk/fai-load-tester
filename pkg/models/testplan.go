@@ -2,6 +2,8 @@ package models
 
 import "time"
 
+// TODO: create initializer functions for each struct with input validation
+
 // TestPlan contains a sequence of TestPhases
 type TestPlan struct {
 	Name                    string
@@ -14,7 +16,7 @@ type TestPlan struct {
 // Contains a TestCaseGetRequest and a number of virtual users executing that TestCaseGetRequest
 type TestPhase struct {
 	Name            string
-	NumVirtualUsers int // number of virtual users executing the TestCaseGetRequest that will be spawned per second
+	NumVirtualUsers int // Number of virtual users executing the TestCaseGetRequest that will be spawned per second. Must be > 0.
 	TestCase        TestCaseGetRequest
 	DurationSeconds time.Duration // duration of the test phase
 	Metrics         VirtualUserAggregatedMetrics

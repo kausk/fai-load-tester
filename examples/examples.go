@@ -44,7 +44,7 @@ func loadTestQPS() {
 	tr := service.NewTestRunner(tp)
 	tr.Start()
 	time.Sleep(10 * time.Second)
-	fmt.Println(tr.Results())
+	fmt.Println(tr.OverallResults().String())
 }
 
 // TODO: add more examples

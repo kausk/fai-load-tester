@@ -11,6 +11,7 @@ type VirtualUser struct {
 	status   models.Status
 	duration time.Duration
 	client   HTTPClientInterface
+	// TODO: also captured HTTP-level metrics like number of HTTP requests, bytes exchanged, etc.
 }
 
 func NewVirtualUser(client HTTPClientInterface) *VirtualUser {

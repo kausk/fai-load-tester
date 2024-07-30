@@ -12,6 +12,7 @@ type VirtualUserAggregatedMetrics struct {
 	P95VUDuration   int
 	P99VUDuration   int
 	MaxVUDuration   int
+	// TODO: also track bytes exchanged, etc.
 }
 
 func (v VirtualUserAggregatedMetrics) String() string {
@@ -29,6 +30,7 @@ type OverallMetrics struct {
 	NumVUsFailed    int
 	AvgVUDuration   int
 	MaxVUDuration   int
+	// TODO: store all VU durations and calculate percentiles
 }
 
 func (t OverallMetrics) String() string {
