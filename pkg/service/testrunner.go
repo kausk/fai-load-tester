@@ -165,12 +165,12 @@ func calculatePhaseMetrics(virtualUsers []*VirtualUser) models.VirtualUserAggreg
 	executionDurations := make([]float64, 0, len(virtualUsers))
 	for _, vu := range virtualUsers {
 		if vu.status == models.CompletedWithSuccess {
+			executionDurations = append(executionDurations, float64(vu.duration)) // only care about durations for successful VUs, e.g. if a request is blocked by a load balancer, that should not count towards the average duration of the service
 			successfulVUs++
 		}
 		if vu.status == models.CompletedWithFailure {
 			failedVUs++
 		}
-		executionDurations = append(executionDurations, float64(vu.duration))
 	}
 	// Sort the durations slice
 	sort.Slice(executionDurations, func(i, j int) bool {

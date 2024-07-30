@@ -1,10 +1,20 @@
 # fai-load-tester
 
+**Overview**
+
+This loadtester generates load by spawning a specified number of Virtual Users (VUs) each second, which each make a specified number of HTTP requests. A desired QPS is achieved by dividing the QPS into VUs and iterations per VU.
+
+The load test is specified using `models.TestPlan`, and this is passed into `service.TestRunner` which executes the test.
+
+Metrics are collected and stored in `service.TestRunner.MetricsByPhase and service.TestRunner.OverallMetrics`.
+
+
+
 **Usage Instructions**
 
 **CLI Documentation**
 ```
-docker run --network host --rm loadtester --help
+ksk@Kaushiks-MacBook-Pro-2 ~/d/loadtester (main)> docker run --network host --rm loadtester --help
 Usage of ./cli:
   -duration int
     	Duration of the test in seconds (default 10)
@@ -15,8 +25,7 @@ Usage of ./cli:
   -url string
     	URL to test (default "http://google.com")
   -virtualUsers int
-    	Number of virtual users. Under 100 QPS, 1 virtual user = 1 query per second. Above 100 QPS, the queries will be distributed evenly across the virtual users. (default 10)
-
+    	Number of virtual users. Under 100 QPS, 1 virtual user = 1 query per second. Above 100 QPS, the queries will be distributed evenly across the virtual users. Note that the actual QPS might be slightly under what is specified in -qps due to rounding down. (default 10)
 ```
 
 **Docker CLI Instructions**
