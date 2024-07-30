@@ -3,12 +3,14 @@ package tests
 import (
 	"errors"
 	"net/http"
+	"time"
 
 	"loadtester/internal/lib/service"
 )
 
 type MockHTTPClient struct {
-	server *MockHTTPServer
+	server          *MockHTTPServer
+	clientLatencyMS int
 }
 
 type MockHTTPServer struct {
@@ -26,13 +28,15 @@ func NewMockHTTPServer(returnErrors, returnTimeouts bool) *MockHTTPServer {
 	}
 }
 
-func NewMockHTTPClient(mockHTTPServer *MockHTTPServer) *MockHTTPClient {
+func NewMockHTTPClient(mockHTTPServer *MockHTTPServer, clientLatencyMS int) *MockHTTPClient {
 	return &MockHTTPClient{
-		server: mockHTTPServer,
+		server:          mockHTTPServer,
+		clientLatencyMS: clientLatencyMS,
 	}
 }
 
 func (m MockHTTPClient) Get(_ string) (*http.Response, error) {
+	time.Sleep(time.Duration(m.clientLatencyMS) * time.Millisecond) // simulate latency
 	if m.server.returnTimeouts {
 		m.server.FailedQueries++
 		return nil, errors.New("method timed out")

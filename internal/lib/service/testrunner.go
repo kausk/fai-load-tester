@@ -17,9 +17,9 @@ type TestRunner struct {
 	status    models.Status
 	// EndTime   time.Time // needed for time duration calculations
 	MetricsByPhase []models.VirtualUserAggregatedMetrics
-	OverallMetrics *models.VirtualUserAggregatedMetrics
+	OverallMetrics *models.TestRunAggregatedMetrics
 	clientFactory  func() HTTPClientInterface
-	done           chan bool // TODO: implement and adopt in unit tests
+	Done           chan bool // TODO: implement and adopt in unit tests
 }
 
 func NewTestRunner(tp models.TestPlan) *TestRunner {
@@ -30,6 +30,7 @@ func NewTestRunner(tp models.TestPlan) *TestRunner {
 		clientFactory: func() HTTPClientInterface {
 			return NewHTTPClient(tp.HTTPTimeoutMilliseconds)
 		},
+		Done: make(chan bool, 1),
 	}
 }
 
@@ -39,6 +40,7 @@ func NewTestRunnerWithHTTPClientFactory(tp models.TestPlan, factory func() HTTPC
 		TestPlan:      tp,
 		status:        models.WaitingForStart,
 		clientFactory: factory,
+		Done:          make(chan bool, 1),
 	}
 }
 
@@ -51,13 +53,14 @@ func (t *TestRunner) Start() {
 	}
 	t.OverallMetrics = calculateOverallMetrics(t.MetricsByPhase)
 	t.status = models.Finished
+	t.Done <- true
 }
 
 func (t *TestRunner) Status() models.Status {
 	return t.status
 }
 
-func (t TestRunner) Results() *models.VirtualUserAggregatedMetrics {
+func (t TestRunner) Results() *models.TestRunAggregatedMetrics {
 	return t.OverallMetrics
 }
 
@@ -71,7 +74,7 @@ func (t *TestRunner) executePhase(tp models.TestPhase) models.VirtualUserAggrega
 	}
 	wg.Wait() // wait for any remaining virtual users to finish
 	metrics := calculatePhaseMetrics(vus)
-	printMetrics(tp.Name, metrics)
+	printPhaseMetrics(tp.Name, metrics)
 	return metrics
 }
 
@@ -125,8 +128,8 @@ func (t *TestRunner) spawnVirtualUser(tc models.TestCaseGetRequest, wg *sync.Wai
 	return vu
 }
 
-func calculateOverallMetrics(phaseMetrics []models.VirtualUserAggregatedMetrics) *models.VirtualUserAggregatedMetrics {
-	overallMetrics := &models.VirtualUserAggregatedMetrics{}
+func calculateOverallMetrics(phaseMetrics []models.VirtualUserAggregatedMetrics) *models.TestRunAggregatedMetrics {
+	overallMetrics := &models.TestRunAggregatedMetrics{}
 	durations := make([]float64, 0, len(phaseMetrics))
 	numVUsSucceeded := make([]float64, 0, len(phaseMetrics))
 	for _, metrics := range phaseMetrics {
@@ -184,14 +187,6 @@ func createTestDurationChannel(duration time.Duration) chan bool {
 	return done
 }
 
-func printMetrics(name string, metrics models.VirtualUserAggregatedMetrics) {
-	fmt.Printf("=====================================\n")
-	fmt.Printf("Test Phase: %s\n", name)
-	fmt.Printf("Number of Virtual Users Created: %d\n", metrics.NumVUsCreated)
-	fmt.Printf("Number of Virtual Users Failed: %d\n", metrics.NumVUsFailed)
-	fmt.Printf("Average Virtual User Duration: %dms\n", metrics.AvgVUDuration)
-	fmt.Printf("P50 Virtual User Duration: %dms\n", metrics.P50VUDuration)
-	fmt.Printf("P95 Virtual User Duration: %dms\n", metrics.P95VUDuration)
-	fmt.Printf("P99 Virtual User Duration: %dms\n", metrics.P99VUDuration)
-	fmt.Printf("=====================================\n")
+func printPhaseMetrics(name string, metrics models.VirtualUserAggregatedMetrics) {
+	fmt.Printf("Phase %s metrics: %s\n", name, metrics.String())
 }
