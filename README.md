@@ -6,7 +6,7 @@ This loadtester generates load by spawning a specified number of Virtual Users (
 
 The load test is specified using `models.TestPlan`, and this is passed into `service.TestRunner` which executes the test.
 
-Metrics are collected and stored in `service.TestRunner.MetricsByPhase and service.TestRunner.OverallMetrics`.
+Metrics are collected and stored in `service.TestRunner.MetricsByPhase` and `service.TestRunner.OverallMetrics`.
 
 
 

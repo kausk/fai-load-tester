@@ -30,6 +30,10 @@ func main() {
 
 	var numIterations int
 	var numVirtualUsers int
+	if *virtualUsers == 0 {
+		fmt.Println("Number of virtual users must be greater than 0")
+		return
+	}
 	if *qps < 100 {
 		fmt.Println("Ignoring virtualUsers flag since QPS is less than 20")
 		numIterations = 1
