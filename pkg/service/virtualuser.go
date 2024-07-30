@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"loadtester/internal/lib/models"
+	"loadtester/pkg/models"
 )
 
 type VirtualUser struct {

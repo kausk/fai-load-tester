@@ -1,18 +1,21 @@
+/*
+This file provides an example of how to use the load tester library.
+It creates a test plan with two test phases and runs the test runner in order to execute the load test.
+*/
 package main
 
 import (
 	"fmt"
+	"loadtester/pkg/models"
+	"loadtester/pkg/service"
 	"time"
-
-	"loadtester/internal/lib/models"
-	"loadtester/internal/lib/service"
 )
 
 func main() {
-	loadTest()
+	loadTestQPS()
 }
 
-func loadTest() {
+func loadTestQPS() {
 	tcOneIteration := models.TestCaseGetRequest{
 		URL:           "http://google.com",
 		NumIterations: 1,
@@ -43,3 +46,5 @@ func loadTest() {
 	time.Sleep(10 * time.Second)
 	fmt.Println(tr.Results())
 }
+
+// TODO: add more examples

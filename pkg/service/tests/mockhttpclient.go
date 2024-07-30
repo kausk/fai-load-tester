@@ -3,9 +3,10 @@ package tests
 import (
 	"errors"
 	"net/http"
+	"sync"
 	"time"
 
-	"loadtester/internal/lib/service"
+	"loadtester/pkg/service"
 )
 
 type MockHTTPClient struct {
@@ -14,11 +15,12 @@ type MockHTTPClient struct {
 }
 
 type MockHTTPServer struct {
-	TotalQueries      int
 	SuccessfulQueries int
 	FailedQueries     int
-	returnErrors      bool
-	returnTimeouts    bool
+	mu                sync.Mutex // lock for updating above counts since MockHTTPClients are run concurrently
+	// TODO: currently not used in unit tests, but intended to simulate error conditions
+	returnErrors   bool
+	returnTimeouts bool
 }
 
 func NewMockHTTPServer(returnErrors, returnTimeouts bool) *MockHTTPServer {
@@ -37,6 +39,7 @@ func NewMockHTTPClient(mockHTTPServer *MockHTTPServer, clientLatencyMS int) *Moc
 
 func (m MockHTTPClient) Get(_ string) (*http.Response, error) {
 	time.Sleep(time.Duration(m.clientLatencyMS) * time.Millisecond) // simulate latency
+	m.server.mu.Lock()
 	if m.server.returnTimeouts {
 		m.server.FailedQueries++
 		return nil, errors.New("method timed out")
@@ -47,6 +50,8 @@ func (m MockHTTPClient) Get(_ string) (*http.Response, error) {
 			StatusCode: 404,
 		}, nil
 	}
+	m.server.SuccessfulQueries++
+	m.server.mu.Unlock()
 	return &http.Response{
 		StatusCode: 200,
 	}, nil

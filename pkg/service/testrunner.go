@@ -8,7 +8,7 @@ import (
 
 	"gonum.org/v1/gonum/stat"
 
-	"loadtester/internal/lib/models"
+	"loadtester/pkg/models"
 )
 
 type TestRunner struct {
@@ -17,7 +17,7 @@ type TestRunner struct {
 	status    models.Status
 	// EndTime   time.Time // needed for time duration calculations
 	MetricsByPhase []models.VirtualUserAggregatedMetrics
-	OverallMetrics *models.TestRunAggregatedMetrics
+	OverallMetrics models.OverallMetrics
 	clientFactory  func() HTTPClientInterface
 	Done           chan bool // TODO: implement and adopt in unit tests
 }
@@ -52,6 +52,7 @@ func (t *TestRunner) Start() {
 		t.MetricsByPhase = append(t.MetricsByPhase, metrics)
 	}
 	t.OverallMetrics = calculateOverallMetrics(t.MetricsByPhase)
+	fmt.Println(t.OverallMetrics.String())
 	t.status = models.Finished
 	t.Done <- true
 }
@@ -60,7 +61,7 @@ func (t *TestRunner) Status() models.Status {
 	return t.status
 }
 
-func (t TestRunner) Results() *models.TestRunAggregatedMetrics {
+func (t TestRunner) Results() models.OverallMetrics {
 	return t.OverallMetrics
 }
 
@@ -86,7 +87,7 @@ func (t *TestRunner) spawnVUsAtStartOfSecond(tp models.TestPhase, wg *sync.WaitG
 		select {
 		case <-done:
 			ticker.Stop()
-			fmt.Printf("Test Phase %s is done\n", tp.Name)
+			fmt.Printf("Test Phase %s has completed its duration\n", tp.Name)
 			return vus
 		case <-ticker.C:
 			for i := 0; i < tp.NumVirtualUsers; i++ {
@@ -100,14 +101,15 @@ func (t *TestRunner) spawnVUsAtStartOfSecond(tp models.TestPhase, wg *sync.WaitG
 }
 
 func (t *TestRunner) spawnVUsEvenly(tp models.TestPhase, wg *sync.WaitGroup) []*VirtualUser {
-	ticker := time.NewTicker(time.Duration(1/tp.NumVirtualUsers) * time.Second)
+	duration := time.Duration(float64(time.Second) / float64(tp.NumVirtualUsers))
+	ticker := time.NewTicker(duration)
 	done := createTestDurationChannel(tp.DurationSeconds)
 	var vus []*VirtualUser
 	for {
 		select {
 		case <-done:
 			ticker.Stop()
-			fmt.Printf("Test Phase %s is done\n", tp.Name)
+			fmt.Printf("Test Phase %s has completed its duration\n", tp.Name)
 			return vus
 		case <-ticker.C:
 			wg.Add(1)
@@ -128,8 +130,8 @@ func (t *TestRunner) spawnVirtualUser(tc models.TestCaseGetRequest, wg *sync.Wai
 	return vu
 }
 
-func calculateOverallMetrics(phaseMetrics []models.VirtualUserAggregatedMetrics) *models.TestRunAggregatedMetrics {
-	overallMetrics := &models.TestRunAggregatedMetrics{}
+func calculateOverallMetrics(phaseMetrics []models.VirtualUserAggregatedMetrics) models.OverallMetrics {
+	overallMetrics := models.OverallMetrics{}
 	durations := make([]float64, 0, len(phaseMetrics))
 	numVUsSucceeded := make([]float64, 0, len(phaseMetrics))
 	for _, metrics := range phaseMetrics {
@@ -148,6 +150,9 @@ func calculateOverallMetrics(phaseMetrics []models.VirtualUserAggregatedMetrics)
 
 func calculatePhaseMetrics(virtualUsers []*VirtualUser) models.VirtualUserAggregatedMetrics {
 	totalNumVUs := len(virtualUsers)
+	if totalNumVUs == 0 {
+		return models.VirtualUserAggregatedMetrics{}
+	}
 	successfulVUs := 0
 	failedVUs := 0
 	executionDurations := make([]float64, 0, len(virtualUsers))
